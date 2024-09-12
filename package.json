@@ -1,8 +1,8 @@
 {
-  "name": "talya_express",
+  "name": "talya-express",
   "version": "1.0.0",
   "description": "the server for talya-project",
-  "main": "App.js",
+  "main": "App.js", 
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
