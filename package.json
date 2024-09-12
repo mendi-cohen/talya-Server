@@ -1,13 +1,13 @@
 {
-  "name": "talya_express",
+  "name": "talya-express",
   "version": "1.0.0",
-  "description": "the server for talya-project",
-  "main": "App.js",
+  "description": "the server for yaffa-project",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node App.js",
-    "dev": "nodemon App.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "author": "mendyCohen",
   "license": "ISC",
