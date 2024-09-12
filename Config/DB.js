@@ -1,15 +1,23 @@
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+import sqlite3 from 'sqlite3';
 
-dotenv.config();
 
-const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.env.PASSWORD, {
-  host: process.env.HOST,
-  dialect: 'mysql', 
-  // dialect: 'postgres',
-
+const db = new sqlite3.Database('./store.db', (err) => {
+  if (err) {
+    console.error('Error opening database: ', err.message);
+  } else {
+    console.log('Connected to the SQLite database.');
+    db.run(`CREATE TABLE IF NOT EXISTS products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      price REAL NOT NULL,
+      description TEXT,
+      image_url image
+      
+    )`, (err) => {
+      if (err) {
+        console.error('Error creating table: ', err.message);
+      }
+    });
+  }
 });
-
-sequelize.sync({});
-
-export default sequelize;
+export { db };
