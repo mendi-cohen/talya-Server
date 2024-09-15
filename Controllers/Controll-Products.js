@@ -26,7 +26,7 @@ class ProductsControll {
       console.log("File upload completed:", req.file);
   
       const { name, price, description } = req.body;
-      const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+      const imageUrl = req.file ? `${process.env.FOOL_URL}/uploads/${req.file.filename}` : null;
   
       try {
         const query = `INSERT INTO products (name, price, description, image_url) VALUES (?, ?, ?, ?)`;
