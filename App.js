@@ -15,10 +15,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 app.use('/products', Products);
 
 // Port
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+app.listen(port, () => {  
   console.log(`Server running on port ${port}`);
 });

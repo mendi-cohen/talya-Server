@@ -11,7 +11,7 @@ const db = new sqlite3.Database('./store.db', (err) => {
       name TEXT NOT NULL,
       price REAL NOT NULL,
       description TEXT,
-      image_url image
+      image_url TEXT
       
     )`, (err) => {
       if (err) {
