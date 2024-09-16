@@ -66,7 +66,7 @@ class ProductsControll {
   async UpdateProduct(req, res) {
     const { id } = req.params;
     const { name, price, description, image_url } = req.body;
-
+  
     try {
       const query = `UPDATE products SET name = ?, price = ?, description = ?, image_url = ? WHERE id = ?`;
       db.run(query, [name, price, description, image_url, id], function (err) {
@@ -82,12 +82,12 @@ class ProductsControll {
       res.status(500).json({ error: 'Error updating product' });
     }
   }
+  
 
   // מחיקת מוצר 
-
   async DeleteProduct(req, res) {
     const { id } = req.params;
-
+  
     try {
       const query = `DELETE FROM products WHERE id = ?`;
       db.run(query, id, function (err) {
@@ -103,6 +103,7 @@ class ProductsControll {
       res.status(500).json({ error: 'Error deleting product' });
     }
   }
+  
 }
 
 export default new ProductsControll();
