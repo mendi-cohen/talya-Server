@@ -15,8 +15,12 @@ const Product = sequelize.define('Product', {
       allowNull: false,
       
     },
+    // image: {
+    //   type: DataTypes.BLOB('long'),
+    //   allowNull: true
+    // },
     image: {
-      type: DataTypes.BLOB('long'),
+      type: DataTypes.BYTEA,
       allowNull: true
     },
     imageType: {
