@@ -7,18 +7,22 @@ const Product = sequelize.define('Product', {
       allowNull: false,
     },
     price: {
-      type: DataTypes.STRING,
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      
     },
     image: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.BLOB('long'),
+      allowNull: true
     },
+    imageType: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   });
 
   export default Product
