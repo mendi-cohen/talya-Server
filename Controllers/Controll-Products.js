@@ -1,7 +1,6 @@
 import multer from 'multer';
 import Products_M from "../Models/options/Options-Products.js";
 
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -23,8 +22,8 @@ class ProductsControll {
           name,
           price,
           description,
-          image: imageBuffer,
-          imageType: imageType
+          image: imageBuffer ? imageBuffer.toString('base64') : null,  // המרת התמונה ל-Base64 לפני השמירה
+          imageType
         });
         res.status(201).json({
           id: product.id,
@@ -44,14 +43,23 @@ class ProductsControll {
   async GetAllProducts(req, res) {
     try {
       const products = await Products_M.getProducts({
-        attributes: ['id', 'name', 'price', 'description', 'imageType']
+        attributes: ['id', 'name', 'price', 'description', 'image', 'imageType']
       });
       
-      const productsWithImageUrl = products.map(product => ({
-        ...product.toJSON(),
-        imageUrl: `/product-image/${product.id}`
-      }));
-      
+      const productsWithImageUrl = products.map(product => {
+        const productJSON = product.toJSON();
+        let base64Image = null;
+
+        if (productJSON.image) {
+          base64Image = `data:${productJSON.imageType};base64,${productJSON.image}`;
+        }
+
+        return {
+          ...productJSON,
+          image: base64Image,
+        };
+      });
+
       res.status(200).json(productsWithImageUrl);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -59,17 +67,17 @@ class ProductsControll {
     }
   }
 
-  // שליפת תמונה של מוצר ספציפי
+  // הצגת תמונה של מוצר ספציפי
   async GetProductImage(req, res) {
     try {
       const { id } = req.params;
       const product = await Products_M.findByPk(id, {
         attributes: ['image', 'imageType']
       });
-      
+
       if (product && product.image) {
         res.contentType(product.imageType);
-        res.send(product.image);
+        res.send(Buffer.from(product.image, 'base64'));
       } else {
         res.status(404).send('Image not found');
       }
@@ -82,7 +90,7 @@ class ProductsControll {
   // עדכון מוצר
   async UpdateProduct(req, res) {
     const { id } = req.params;
-    
+
     upload.single('image')(req, res, async function (err) {
       if (err) {
         console.error("Error during file upload:", err.message);
@@ -93,7 +101,7 @@ class ProductsControll {
       const updateData = { name, price, description };
 
       if (req.file) {
-        updateData.image = req.file.buffer;
+        updateData.image = req.file.buffer.toString('base64');
         updateData.imageType = req.file.mimetype;
       }
 
