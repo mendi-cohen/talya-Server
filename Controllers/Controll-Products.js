@@ -1,147 +1,96 @@
-import multer from 'multer';
-import Products_M from "../Models/options/Options-Products.js";
+import ProductService from '../Models/Services/Service-Products.js';
+import { upload } from '../Config/multer.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-class ProductsControll {
-  // הוספת מוצר
-  async Add_Product(req, res) {
+class ProductController {
+  async getAllProducts(req, res) {
+    try {
+      const products = await ProductService.getAllProducts();
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ error: 'שגיאה בשליפת המוצרים' });
+    }
+  }
+
+  async getProductById(req, res) {
+    try {
+      const product = await ProductService.getProductById(req.params.id);
+      if (product) {
+        res.json(product);
+      } else {
+        res.status(404).json({ error: 'מוצר לא נמצא' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'שגיאה בשליפת המוצר' });
+    }
+  }
+  
+
+  async createProduct(req, res) {
     upload.single('image')(req, res, async function (err) {
       if (err) {
-        console.error("Error during file upload:", err.message);
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: 'שגיאה בהעלאת הקובץ' });
       }
-
-      const { name, price, description } = req.body;
-      const imageBuffer = req.file ? req.file.buffer : null;
-      const imageType = req.file ? req.file.mimetype : null;
-
       try {
-        const product = await Products_M.save({
+        const { name, price, description } = req.body;
+        const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+        const product = await ProductService.createProduct({
           name,
           price,
           description,
-          image: imageBuffer ? imageBuffer.toString('base64') : null,  // המרת התמונה ל-Base64 לפני השמירה
-          imageType
+          image: imagePath,
         });
-        res.status(201).json({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          description: product.description,
-          imageType: product.imageType
-        });
+        res.status(201).json(product);
       } catch (error) {
-        console.error("Error inserting product:", error.message);
-        res.status(500).json({ error: 'Error inserting product' });
+        res.status(500).json({ error: 'שגיאה ביצירת המוצר' });
       }
     });
   }
 
-  // הצגת כל המוצרים
-  async GetAllProducts(req, res) {
-    try {
-      const products = await Products_M.getProducts({
-        attributes: ['id', 'name', 'price', 'description', 'image', 'imageType']
-      });
-      
-      const productsWithImageUrl = products.map(product => {
-        const productJSON = product.toJSON();
-        let base64Image = null;
-
-        if (productJSON.image) {
-          base64Image = `data:${productJSON.imageType};base64,${productJSON.image}`;
-        }
-
-        return {
-          ...productJSON,
-          image: base64Image,
-        };
-      });
-
-      res.status(200).json(productsWithImageUrl);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ error: 'Error fetching products' });
-    }
-  }
-
-  // הצגת תמונה של מוצר ספציפי
-  async GetProductImage(req, res) {
-    try {
-      const { id } = req.params;
-      const product = await Products_M.findByPk(id, {
-        attributes: ['image', 'imageType']
-      });
-
-      if (product && product.image) {
-        res.contentType(product.imageType);
-        res.send(Buffer.from(product.image, 'base64'));
-      } else {
-        res.status(404).send('Image not found');
-      }
-    } catch (error) {
-      console.error('Error fetching product image:', error);
-      res.status(500).send('Server error');
-    }
-  }
-
-  // עדכון מוצר
-  async UpdateProduct(req, res) {
-    const { id } = req.params;
-
+  async updateProduct(req, res) {
     upload.single('image')(req, res, async function (err) {
       if (err) {
-        console.error("Error during file upload:", err.message);
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: 'שגיאה בהעלאת הקובץ' });
       }
-
-      const { name, price, description } = req.body;
-      const updateData = { name, price, description };
-
-      if (req.file) {
-        updateData.image = req.file.buffer.toString('base64');
-        updateData.imageType = req.file.mimetype;
-      }
-
       try {
-        const [updated] = await Products_M.update(updateData, {
-          where: { id }
-        });
-
-        if (updated) {
-          const updatedProduct = await Products_M.findByPk(id, {
-            attributes: ['id', 'name', 'price', 'description', 'imageType']
-          });
-          res.status(200).json(updatedProduct);
-        } else {
-          res.status(404).json({ error: 'Product not found' });
+        const { name, price, description } = req.body;
+        const updateData = { name, price, description };
+        if (req.file) {
+          updateData.image = `/uploads/${req.file.filename}`;
         }
+        const product = await ProductService.updateProduct(req.params.id, updateData);
+        res.json(product);
       } catch (error) {
-        res.status(500).json({ error: 'Error updating product' });
+        res.status(500).json({ error: 'שגיאה בעדכון המוצר' });
       }
     });
   }
 
-  // מחיקת מוצר
-  async DeleteProduct(req, res) {
-    const { id } = req.params;
-
+  async deleteProduct(req, res) {
     try {
-      const deleted = await Products_M.destroy({
-        where: { id }
-      });
+      await ProductService.deleteProduct(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: 'שגיאה במחיקת המוצר' });
+    }
+  }
 
-      if (deleted) {
-        res.status(200).json({ message: 'Product deleted successfully' });
+  async getProductImage(req, res) {
+    try {
+      const product = await ProductService.getProductById(req.params.id);
+      if (product && product.image) {
+        res.sendFile(path.join(__dirname, '..', product.image));
       } else {
-        res.status(404).json({ error: 'Product not found' });
+        res.status(404).send('תמונה לא נמצאה');
       }
     } catch (error) {
-      res.status(500).json({ error: 'Error deleting product' });
+      res.status(500).send('שגיאת שרת');
     }
   }
 }
 
-export default new ProductsControll();
+export default new ProductController();

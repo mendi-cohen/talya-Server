@@ -1,26 +1,32 @@
 import express from 'express';
+import sequelize from './Config/DB.js';
+import productRoutes from './Routers/Router-Products.js';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import Products from './Routers/Router-Products.js';
-import Ping from './Routers/Router-Ping.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-const app = express();
+import dotenv from 'dotenv';
 dotenv.config();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const app = express();
+app.use(cors());
+app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/products', productRoutes);
 
-app.use('/',Ping)
-app.use('/products', Products);
 
-// Port
-const port = process.env.PORT || 3000;
-app.listen(port, () => {  
-  console.log(`Server running on port ${port}`);
-});
+sequelize.sync({})
+  .then(() => {
+    console.log('מסד הנתונים והטבלאות נוצרו בהצלחה!');
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`השרת פועל על פורט ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('שגיאה ביצירת מסד הנתונים:', err);
+  });
+
+export default app;
