@@ -1,6 +1,7 @@
 import express from 'express';
 import sequelize from './Config/DB.js';
 import productRoutes from './Routers/Router-Products.js';
+import OrdersRoutes from './Routers/Router-Orders.js';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,11 +16,12 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/products', productRoutes);
+app.use('/orders', OrdersRoutes);
 
 
 sequelize.sync({})
   .then(() => {
-    console.log('מסד הנתונים והטבלאות נוצרו בהצלחה!');
+    
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
       console.log(`השרת פועל על פורט ${port}`);
