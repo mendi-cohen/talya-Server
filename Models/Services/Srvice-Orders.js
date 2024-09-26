@@ -1,10 +1,16 @@
 import Order from '../DataBase/Data-Orders.js';
 
 class OrdersService {
-  async getAllOrders() {
-    return await Order.findAll();
-  }
-
+  async getAllNewOrders() {
+    return await Order.findAll({
+      where: { completed: false } 
+    });
+}
+  async getAllComletedOrders() {
+    return await Order.findAll({
+      where: { completed: true } 
+    });
+}
   async getOrderById(id) {
     return await Order.findByPk(id);
   }
@@ -30,6 +36,16 @@ class OrdersService {
     if (!deleted) {
       throw new Error('מוצר לא נמצא');
     }
+  }
+
+  async updateOrderStatus(id, completed) {
+    const [updated] = await Order.update({ completed }, {
+      where: { id }
+    });
+    if (updated) {
+      return await Order.findByPk(id);
+    }
+    throw new Error('ההזמנה לא נמצאה');
   }
 }
 
