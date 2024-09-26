@@ -20,7 +20,7 @@ app.use('/products', productRoutes);
 app.use('/orders', OrdersRoutes);
 
 
-sequelize.sync({})
+sequelize.sync({force: true})
   .then(() => {
     
     const port = process.env.PORT || 3000;
