@@ -9,7 +9,7 @@ class WhatsAppController {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
-              chatId: `972586086033@c.us`, 
+              chatId: `972583235436@c.us`, 
               message: `מחכה לכם הזמנה באתר!  (הזמנה מספר ${orderId} מהאתר  ) כנסו לטפל בהזמנה: https://talya-project.netlify.app/  ` 
             })
           })
