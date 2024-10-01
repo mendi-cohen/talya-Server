@@ -21,7 +21,7 @@ app.use("/products", productRoutes);
 app.use("/orders", OrdersRoutes);
 
 
-cron.schedule('33 9 * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
   try {
     const deletedCount = await OrdersService.deleteOldOrders();
     console.log(`נמחקו ${deletedCount} הזמנות ישנות`);
