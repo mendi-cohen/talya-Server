@@ -1,4 +1,5 @@
 import Order from '../DataBase/Data-Orders.js';
+import { Op } from 'sequelize';
 
 class OrdersService {
   async getAllNewOrders() {
@@ -11,6 +12,26 @@ class OrdersService {
       where: { completed: true } 
     });
 }
+
+async deleteOldOrders() {
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  
+  try {
+    const result = await Order.destroy({
+      where: {
+        createdAt: {
+          [Op.lt]: oneYearAgo
+        }
+      }
+    });
+    return result;
+  } catch (error) {
+    console.error('Error deleting old orders:', error);
+    throw error;
+  }
+}
+
   async getOrderById(id) {
     return await Order.findByPk(id);
   }
