@@ -10,5 +10,5 @@ const sequelize = new Sequelize({
   storage: path.join(__dirname, '..', 'Store.sqlite')
 });
 sequelize.sync({});
-
+///
 export default sequelize;
