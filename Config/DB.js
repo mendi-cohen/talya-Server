@@ -9,6 +9,6 @@ const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: path.join(__dirname, '..', 'Store.sqlite')
 });
-sequelize.sync({force: true});
+sequelize.sync({});
 ///
 export default sequelize;
