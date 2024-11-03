@@ -28,9 +28,9 @@ async function keepAlive() {
     try {
         const response = await fetch(SERVER_URL);
         if (response.ok) {
-            console.log('Server is alive:', new Date().toISOString());
+          await bot.sendMessage(CHAT_ID, '🟢 השרת פעיל ומגיב!');
         } else {
-            throw new Error(`Server returned ${response.status}`);
+          await bot.sendMessage(CHAT_ID, `🔴 השרת מגיב אבל עם שגיאה: ${response.status}`);
         }
     } catch (error) {
         console.error('Server check failed:', error);
@@ -52,14 +52,7 @@ bot.onText(/\/status/, async (msg) => {
     }
 });
 
-bot.onText(/\/orders/, async (msg) => {
-    try {
-        const ordersCount = await OrdersService.getActiveOrdersCount(); // צריך להוסיף פונקציה כזו לסרביס
-        await bot.sendMessage(msg.chat.id, `📦 מספר ההזמנות הפעילות: ${ordersCount}`);
-    } catch (error) {
-        await bot.sendMessage(msg.chat.id, `❌ שגיאה בקבלת נתוני הזמנות: ${error.message}`);
-    }
-});
+
 
 
 
