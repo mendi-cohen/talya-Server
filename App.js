@@ -70,6 +70,9 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/products", productRoutes);
 app.use("/orders", OrdersRoutes);
+app.get('/status', (req, res) => {
+  res.status(200).send('Server is running');
+});
 
 // משימה מתוזמנת למחיקת הזמנות ישנות
 cron.schedule('0 0 * * *', async () => {
