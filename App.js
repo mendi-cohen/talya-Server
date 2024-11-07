@@ -28,7 +28,7 @@ async function keepAlive() {
     try {
         const response = await fetch(SERVER_URL);
         if (response.ok) {
-          await bot.sendMessage(CHAT_ID, '🟢 השרת פעיל ומגיב!');
+         
         } else {
           await bot.sendMessage(CHAT_ID, `🔴 השרת מגיב אבל עם שגיאה: ${response.status}`);
         }
